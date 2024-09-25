@@ -15,93 +15,117 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         },
         mounted() {
+            // Get the file URL from the query string using URLSearchParams
             const urlParams = new URLSearchParams(window.location.search);
             this.fileUrl = urlParams.get('url');
-            console.log('File URL:', this.fileUrl); // Debug log to check the file URL
-            this.checkFileExtension();
+            
+            if (this.fileUrl) {
+                console.log('File URL from query string:', this.fileUrl);
+                this.checkFileExtension();
+            } else {
+                console.error('Error: No URL provided in query string.');
+                this.error = 'No file URL provided in the query string.';
+            }
         },
         methods: {
             async fetchIVFromURL() {
                 const ivUrl = this.fileUrl.replace(/\.enc$/, '.iv');
-                console.log('IV URL:', ivUrl); // Debug log to check the IV URL
+                console.log('IV URL:', ivUrl);
 
                 try {
                     const response = await fetch(ivUrl);
                     if (!response.ok) {
                         throw new Error(`Unable to fetch the IV from the specified URL. Status: ${response.status}`);
                     }
-                    console.log('IV fetched successfully'); // Log on successful IV fetch
+                    console.log('IV fetched successfully');
                     return await response.arrayBuffer();
                 } catch (err) {
-                    console.error('Error fetching IV:', err.message); // Log IV fetch error
+                    console.error('Error fetching IV:', err.message);
+                    throw err;
+                }
+            },
+            async fetchSaltFromURL() {
+                const saltUrl = this.fileUrl.replace(/\.enc$/, '.salt');
+                console.log('Salt URL:', saltUrl);
+
+                try {
+                    const response = await fetch(saltUrl);
+                    if (!response.ok) {
+                        throw new Error(`Unable to fetch the Salt from the specified URL. Status: ${response.status}`);
+                    }
+                    console.log('Salt fetched successfully');
+                    return await response.arrayBuffer();
+                } catch (err) {
+                    console.error('Error fetching Salt:', err.message);
                     throw err;
                 }
             },
             async decryptFile() {
                 if (!this.password || !this.fileUrl) {
                     this.error = 'Please provide the password and file URL.';
-                    console.error(this.error); // Log missing password or file URL
                     return;
                 }
-                console.log('Starting decryption...'); // Log decryption start
+
+                console.log('Starting decryption...');
                 try {
                     const iv = await this.fetchIVFromURL();
+                    const salt = await this.fetchSaltFromURL();
                     const encryptedData = await fetch(this.fileUrl).then(res => res.arrayBuffer());
-                    console.log('Encrypted data fetched successfully'); // Log successful encrypted data fetch
+                    console.log('Encrypted data fetched successfully');
 
-                    const key = await crypto.subtle.importKey(
+                    const passwordKey = await crypto.subtle.importKey(
                         "raw",
                         new TextEncoder().encode(this.password),
                         { name: "PBKDF2" },
                         false,
                         ["deriveKey"]
                     );
-                    console.log('Key imported successfully'); // Log key import success
+                    console.log('Password key imported successfully');
 
                     const derivedKey = await crypto.subtle.deriveKey(
                         {
                             name: "PBKDF2",
-                            salt: new TextEncoder().encode("salt"),
+                            salt: salt,
                             iterations: 100000,
                             hash: "SHA-256"
                         },
-                        key,
+                        passwordKey,
                         { name: "AES-CBC", length: 256 },
                         true,
                         ["decrypt"]
                     );
-                    console.log('Derived key generated successfully'); // Log key derivation success
+                    console.log('Derived key generated successfully');
 
                     const decrypted = await crypto.subtle.decrypt(
                         { name: "AES-CBC", iv: iv },
                         derivedKey,
                         encryptedData
                     );
-                    console.log('Decryption successful'); // Log decryption success
+                    console.log('Decryption successful');
 
                     const decoder = new TextDecoder();
                     this.decryptedText = decoder.decode(decrypted);
                     this.error = '';
 
                     if (this.isMarkdown) {
-                        this.decryptedMarkdown = marked(this.decryptedText);
+                        this.decryptedMarkdown = marked.parse(this.decryptedText);
                     }
 
-                    console.log('Decrypted Text:', this.decryptedText); // Log decrypted text
+                    console.log('Decrypted Text:', this.decryptedText);
                 } catch (err) {
                     this.error = "Decryption error: " + err.message;
-                    console.error(this.error); // Log decryption error
-                    this.decryptedText = '';
-                    this.decryptedMarkdown = '';
+                    console.error(this.error);
                 }
             },
             checkFileExtension() {
                 if (this.fileUrl && this.fileUrl.endsWith('.md')) {
                     this.isMarkdown = true;
                 }
-                console.log('Is Markdown:', this.isMarkdown); // Log markdown check
+                console.log('Is Markdown:', this.isMarkdown);
             }
         }
     }).use(vuetify).mount('#app');
 });
 
+// Include the latest version of marked from CDN
+// <script src="https://cdn.jsdelivr.net/npm/marked@5.0.2/marked.min.js"></script>
