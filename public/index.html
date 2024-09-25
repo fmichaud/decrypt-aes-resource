@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦫 Tamia - 🔑 Uncrypt AES Resource Service</title>
+    <link rel="stylesheet" href="uncrypt-aes-resource.css"> 
+</head>
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container class="mt-5">
+                    <v-card>
+                        <v-card-title>🔑 Decrypt the Encrypted File</v-card-title>
+                        <v-card-text>
+                            <v-text-field v-model="password" label="Passphrase:" type="password"></v-text-field>
+                            <v-btn @click="decryptFile" color="primary">Decrypt</v-btn>
+                            <v-alert v-if="error" type="error">{{ error }}</v-alert>
+                            <div v-if="isMarkdown" v-html="decryptedMarkdown"></div>
+                            <v-card-subtitle v-else>{{ decryptedText }}</v-card-subtitle>
+                        </v-card-text>
+                    </v-card>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="uncrypt-aes-resource.libs.js"></script> 
+    <script src="uncrypt-aes-resource.js"></script> 
+</body>
+</html>
+
