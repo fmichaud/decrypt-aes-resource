@@ -3,31 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦫 Tamia - 🔑 Uncrypt AES Resource Service</title>
-    <link rel="stylesheet" href="uncrypt-aes-resource.css"> 
+    <title>🦫 Tamia - 🔑 Decrypt AES Resource Service</title>
+    <link rel="stylesheet" href="decrypt-aes-resource.third.css"> 
+    <link rel="stylesheet" href="decrypt-aes-resource.css"> 
 </head>
 <body>
+
     <div id="app">
         <v-app>
+            <!-- Add AppBar -->
+            <v-app-bar app color="primary" dark>
+                <v-toolbar-title>🔑 Uncrypt Resource Service</v-toolbar-title>
+            </v-app-bar>
+    
             <v-main>
                 <v-container class="mt-5">
                     <v-card>
-                        <v-card-title>🔑 Decrypt the Encrypted File</v-card-title>
+                        <!-- Show warning if passphrase is stored in localStorage -->
+                        <v-card-subtitle v-if="passwordEntered" class="text-right text-caption">
+                            ⚠️ Passphrase stored in localStorage.
+                        </v-card-subtitle>
+    
+                        <!-- Hide the passphrase title if the password is stored -->
+                        <v-card-title v-if="!passwordEntered">Passphrase to resource access</v-card-title>
+    
                         <v-card-text>
-                            <v-text-field v-model="password" label="Passphrase:" type="password"></v-text-field>
-                            <v-btn @click="decryptFile" color="primary">Decrypt</v-btn>
+                            <!-- Hide password field if password is already entered -->
+                            <v-text-field v-if="!passwordEntered" v-model="password" label="Enter the password" type="password"></v-text-field>
+                            <v-btn v-if="!passwordEntered" @click="decryptFile" color="primary">Decrypt</v-btn>
                             <v-alert v-if="error" type="error">{{ error }}</v-alert>
-                            <div v-if="isMarkdown" v-html="decryptedMarkdown"></div>
+    
+                            <!-- Render the converted Markdown as HTML using VueShowdown -->
+                            <vue-showdown v-if="decryptedText" :markdown="decryptedText" :options="{ tables: true }"> </vue-showdown>></vue-showdown>
+    
+                            <!-- Render the decrypted text as plain text (fallback) -->
                             <v-card-subtitle v-else>{{ decryptedText }}</v-card-subtitle>
                         </v-card-text>
+                        <!-- Add Clear Password Button at the Bottom -->
+                        <v-card-actions>
+                            <v-btn @click="clearPassword" color="error">Clear Password</v-btn>
+                        </v-card-actions>
                     </v-card>
                 </v-container>
             </v-main>
+    
+            <!-- Add Footer with links -->
+            <v-footer app>
+                <v-col class="text-center">
+                    🚀 Powered by Tamia | 
+                    <a href="https://github.com/fmichaud/decrypt-aes-resource" target="_blank">GitHub</a> | 
+                    <a href="https://fr.linkedin.com/in/francoisxaviermichaud" target="_blank">LinkedIn</a>
+                </v-col>
+            </v-footer>
         </v-app>
     </div>
-
-    <script src="uncrypt-aes-resource.libs.js"></script> 
-    <script src="uncrypt-aes-resource.js"></script> 
+    
+    <script src="decrypt-aes-resource.third.js"></script> 
+    <script src="decrypt-aes-resource.js"></script> 
 </body>
 </html>
 

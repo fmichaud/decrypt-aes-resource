@@ -1,14 +1,14 @@
 {
-  "name": "uncrypt-aes-resource",
+  "name": "decrypt-aes-resource",
   "version": "0.0.1",
-  "description": "Static webapp to uncrypt a resource crypted using AES-CBC",
+  "description": "Static webapp to decrypt a resource crypted using AES-CBC",
   "main": "app/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fmichaud/uncrypt-aes-resource.git"
+    "url": "git+https://github.com/fmichaud/decrypt-aes-resource.git"
   },
   "keywords": [
     "encryption",
@@ -16,17 +16,18 @@
     "aes-cbc",
     "resource",
     "url",
-    "uncrypt",
+    "decrypt",
     "crypt",
     "@fmichaud"
   ],
   "author": "François-Xavier Michaud <https://linkedin.com/in/francoisxaviermichaud>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fmichaud/uncrypt-aes-resource/issues"
+    "url": "https://github.com/fmichaud/decrypt-aes-resource/issues"
   },
-  "homepage": "https://github.com/fmichaud/uncrypt-aes-resource#readme",
+  "homepage": "https://github.com/fmichaud/decrypt-aes-resource#readme",
   "dependencies": {
+    "axios": "^1.7.7",
     "express": "^4.21.0"
   },
   "devDependencies": {
